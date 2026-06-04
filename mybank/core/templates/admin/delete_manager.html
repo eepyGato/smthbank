@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление менеджера - MyBank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Удаление менеджера</h4>
+                </div>
+                <div class="card-body">
+                    <p>Вы действительно хотите удалить менеджера <strong>{{ manager.username }}</strong>?</p>
+                    <p class="text-danger">Это действие нельзя отменить. Все данные менеджера будут удалены.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'core:admin_managers' %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-danger">Да, удалить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

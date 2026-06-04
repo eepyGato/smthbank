@@ -1,0 +1,17 @@
+Django
+psycopg2-binary
+dj-database-url
+python-dotenv
+pillow
+requests
+django-crispy-forms
+crispy-bootstrap5
+celery
+redis
+twelvedata
+django-cryptography
+gunicorn
+eventlet
+websocket-client
+yfinance
+whitenoise==6.6.0

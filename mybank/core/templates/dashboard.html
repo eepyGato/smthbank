@@ -1,0 +1,142 @@
+<!-- templates/dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Мой кабинет - MyBank{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data|safe }},
+            datasets: [{
+                label: 'Динамика баланса',
+                data: {{ chart_data|safe }},
+                borderColor: '#27ae60',
+                backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Динамика за последние 30 дней' }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Баланс -->
+    <div class="col-md-4 mb-4">
+        <div class="card balance-card text-center p-4">
+            <i class="fas fa-wallet fa-3x mb-3"></i>
+            <h5>Ваш баланс</h5>
+            <h3>{{ profile.balance|floatformat:2 }} ₽</h3>
+            <a href="{% url 'core:account' %}" class="btn btn-light mt-3">Пополнить</a>
+        </div>
+    </div>
+    
+    <!-- Портфель -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+            <i class="fas fa-briefcase fa-3x text-primary mb-3"></i>
+            <h5>Стоимость портфеля</h5>
+            <h3>{{ portfolio_value|floatformat:2 }} ₽</h3>
+            <a href="{% url 'core:portfolio' %}" class="btn btn-outline-primary mt-3">Управлять</a>
+        </div>
+    </div>
+    
+    <!-- Прибыль -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+            <i class="fas fa-chart-line fa-3x {% if total_profit >= 0 %}text-success{% else %}text-danger{% endif %} mb-3"></i>
+            <h5>Общая прибыль</h5>
+            <h3 class="{% if total_profit >= 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                {{ total_profit|floatformat:2 }} ₤
+                <small>({{ profit_percent|floatformat:1 }}%)</small>
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- График -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Динамика операций</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="portfolioChart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- Последние транзакции -->
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Последние операции</h5>
+        <a href="{% url 'core:transactions' %}" class="btn btn-sm btn-outline-primary">Все операции →</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Дата</th>
+                        <th>Тип</th>
+                        <th>Актив</th>
+                        <th>Количество</th>
+                        <th>Сумма</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in recent_transactions %}
+                    <tr>
+                        <td>{{ tx.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if tx.type == 'deposit' %}
+                                <span class="badge bg-success">Пополнение</span>
+                            {% elif tx.type == 'withdraw' %}
+                                <span class="badge bg-warning">Вывод</span>
+                            {% elif tx.type == 'buy' %}
+                                <span class="badge bg-primary">Покупка</span>
+                            {% elif tx.type == 'sell' %}
+                                <span class="badge bg-info">Продажа</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ tx.get_type_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ tx.asset.symbol|default:"—" }}</td>
+                        <td>{{ tx.quantity|default:"—" }}</td>
+                        <td class="{% if tx.type == 'deposit' %}text-success{% elif tx.type == 'withdraw' %}text-danger{% endif %}">
+                            {{ tx.amount|floatformat:2 }} ₽
+                        </td>
+                        <td>
+                            {% if tx.status == 'completed' %}
+                                <span class="badge bg-success">Выполнено</span>
+                            {% elif tx.status == 'pending' %}
+                                <span class="badge bg-warning">Ожидает</span>
+                            {% else %}
+                                <span class="badge bg-danger">Отменено</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">Нет операций</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

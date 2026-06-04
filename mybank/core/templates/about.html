@@ -1,0 +1,57 @@
+<!-- templates/about.html -->
+{% extends 'base.html' %}
+
+{% block title %}О компании - ДепБанк{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h2 class="mb-0"><i class="fas fa-landmark me-2"></i>О компании ДепБанк</h2>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-building fa-4x text-primary mb-3"></i>
+                    <h3>Ваш надёжный финансовый партнёр</h3>
+                </div>
+                
+                <h4>История</h4>
+                <p>Додеп был основан в 2026 году с целью предоставить клиентам современный, удобный и безопасный банковский сервис (и написать курсач, ну так, без суеты, тихонечка, опционально). За годы работы мы завоевали доверие тысяч клиентов и продолжаем развиваться, внедряя инновационные решения в области финансовых технологий.</p>
+                
+                <h4 class="mt-4">Наша миссия</h4>
+                <p>Сделать управление личными финансами простым, доступным и выгодным для каждого. Мы стремимся предоставить клиентам не только традиционные банковские услуги, но и возможность инвестировать в ценные бумаги через нашу платформу.</p>
+                
+                <h4 class="mt-4">Преимущества</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Бесплатное открытие счёта</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Мобильное приложение</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Круглосуточная поддержка</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Низкие комиссии</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Современные технологии</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Надёжная защита данных</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Реквизиты</h4>
+                <div class="bg-light p-3 rounded">
+                    <p><strong>Полное наименование:</strong> ООО «Настоящий Цирк»</p>
+                    <p><strong>Юридический адрес:</strong> г. Минск, ул. Михася Лынькова, 65, первый подвал справа</p>
+                    <p><strong>ИНН:</strong> 14881488</p>
+                    <p><strong>КПП:</strong> 13371337</p>
+                    <p><strong>ОГРН:</strong> 10101010101</p>
+                    <p><strong>БИК:</strong> 228228228</p>
+                    <p><strong>Корреспондентский счёт:</strong> а_это_ещё_что?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

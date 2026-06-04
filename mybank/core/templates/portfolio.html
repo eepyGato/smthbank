@@ -1,0 +1,123 @@
+<!-- templates/portfolio.html -->
+{% extends 'base.html' %}
+
+{% block title %}Мой портфель - MyBank{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-briefcase me-2"></i>Мой портфель</h1>
+    <span class="badge bg-secondary fs-6">Комиссия: {{ commission.commission_percent }}%</span>
+</div>
+
+<!-- Сводка портфеля -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h6 class="text-muted">Общая стоимость</h6>
+            <h3 class="mb-0">{{ portfolio_value|floatformat:2 }} ₽</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h6 class="text-muted">Вложено</h6>
+            <h3 class="mb-0">{{ total_cost|floatformat:2 }} ₽</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <h6 class="text-muted">Прибыль</h6>
+            <h3 class="mb-0 {% if total_profit >= 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                {{ total_profit|floatformat:2 }} ₽
+                <small>({{ profit_percent|floatformat:1 }}%)</small>
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица позиций -->
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Мои активы</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Актив</th>
+                        <th>Количество</th>
+                        <th>Средняя цена</th>
+                        <th>Текущая цена</th>
+                        <th>Текущая стоимость</th>
+                        <th>Прибыль</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in portfolio_items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.asset.symbol }}</strong><br>
+                            <small class="text-muted">{{ item.asset.name }}</small>
+                        </td>
+                        <td>{{ item.quantity|floatformat:6 }}</td>
+                        <td>{{ item.average_buy_price|floatformat:2 }} ₽</td>
+                        <td>{{ item.asset.current_price|floatformat:2 }} ₽</td>
+                        <td>{{ item.current_value|floatformat:2 }} ₽</td>
+                        <td class="{% if item.profit_loss >= 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                            {{ item.profit_loss|floatformat:2 }} ₽
+                            <br>
+                            <small>({{ item.profit_loss_percent|floatformat:1 }}%)</small>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#sellModal{{ item.id }}">
+                                Продать
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Модальное окно продажи -->
+                    <div class="modal fade" id="sellModal{{ item.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'core:sell_asset' item.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Продажа {{ item.asset.symbol }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>У вас в портфеле:</strong> {{ item.quantity|floatformat:6 }} акций</p>
+                                        <p><strong>Текущая цена:</strong> {{ item.asset.current_price|floatformat:2 }} ₽</p>
+                                        <p><strong>Комиссия:</strong> {{ commission.commission_percent }}%</p>
+                                        <div class="mb-3">
+                                            <label for="quantity" class="form-label">Количество для продажи</label>
+                                            <input type="number" name="quantity" id="quantity" class="form-control" step="0.000001" min="0.000001" max="{{ item.quantity }}" required>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <small>Средства поступят на баланс после продажи</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                        <button type="submit" class="btn btn-danger">Подтвердить продажу</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-folder-open fa-2x text-muted mb-2 d-block"></i>
+                            У вас пока нет активов в портфеле.<br>
+                            <a href="{% url 'core:market' %}" class="btn btn-primary mt-2">Перейти на рынок</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

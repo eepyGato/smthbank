@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой счёт - MyBank{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Текущий баланс</h5>
+                    <h2 class="display-4">{{ profile.balance|floatformat:2 }} ₽</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Всего инвестировано</h5>
+                    <h2 class="display-4">{{ profile.total_invested|floatformat:2 }} ₽</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Пополнение счёта -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Пополнение счёта</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'core:deposit' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Сумма пополнения</label>
+                            <input type="number" name="amount" class="form-control" step="0.01" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Пополнить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Вывод средств -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Вывод средств</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'core:withdraw' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Сумма вывода</label>
+                            <input type="number" name="amount" class="form-control" step="0.01" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Создать заявку</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Заявки на вывод -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Мои заявки на вывод</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Сумма</th>
+                            <th>Дата создания</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in withdraw_requests %}
+                        <tr>
+                            <td>{{ req.amount|floatformat:2 }} ₽</a></td>
+                            <td>{{ req.created_at|date:"d.m.Y H:i" }}</a></td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                    <span class="badge bg-warning">Ожидает</span>
+                                {% elif req.status == 'completed' %}
+                                    <span class="badge bg-success">Выполнен</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Отклонён</span>
+                                {% endif %}
+                            </a>
+                        </a>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Нет заявок на вывод</a>
+                        </a>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

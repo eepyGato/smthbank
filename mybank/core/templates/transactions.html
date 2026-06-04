@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}История операций - MyBank{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">История операций</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Дата</th>
+                            <th>Тип</th>
+                            <th>Актив</th>
+                            <th>Количество</th>
+                            <th>Цена</th>
+                            <th>Сумма</th>
+                            <th>Комиссия</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td>{{ tx.created_at|date:"d.m.Y H:i" }}</a></td>
+                            <td>
+                                {% if tx.type == 'deposit' %}
+                                    <span class="badge bg-success">Пополнение</span>
+                                {% elif tx.type == 'withdraw' %}
+                                    <span class="badge bg-warning">Вывод</span>
+                                {% elif tx.type == 'buy' %}
+                                    <span class="badge bg-primary">Покупка</span>
+                                {% elif tx.type == 'sell' %}
+                                    <span class="badge bg-info">Продажа</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ tx.get_type_display }}</span>
+                                {% endif %}
+                            </a>
+                            <td>{{ tx.asset.symbol|default:"—" }}</a></td>
+                            <td>{{ tx.quantity|default:"—" }}</a></td>
+                            <td>{{ tx.price|floatformat:2|default:"—" }}</a></td>
+                            <td class="{% if tx.type == 'deposit' %}text-success{% elif tx.type == 'withdraw' %}text-danger{% endif %}">
+                                {{ tx.amount|floatformat:2 }} ₽
+                            </a>
+                            <td>{{ tx.commission|floatformat:2 }} ₽</a></td>
+                            <td>
+                                {% if tx.status == 'completed' %}
+                                    <span class="badge bg-success">Выполнено</span>
+                                {% elif tx.status == 'pending' %}
+                                    <span class="badge bg-warning">Ожидает</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Отменено</span>
+                                {% endif %}
+                            </a>
+                        </a>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Нет операций</a>
+                        </a>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

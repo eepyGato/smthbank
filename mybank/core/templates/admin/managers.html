@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление менеджерами - MyBank{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Управление менеджерами</h4>
+            <a href="{% url 'core:admin_add_manager' %}" class="btn btn-light">
+                <i class="fas fa-plus"></i> Добавить менеджера
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Email</th>
+                            <th>Дата создания</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for manager in managers %}
+                        <tr>
+                            <td>{{ manager.id }}</a></td>
+                            <td>{{ manager.username }}</a></td>
+                            <td>{{ manager.email }}</a></td>
+                            <td>{{ manager.date_joined|date:"d.m.Y H:i" }}</a></td>
+                            <td>
+                                <a href="{% url 'core:admin_delete_manager' manager.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить менеджера?')">Удалить</a>
+                            </a>
+                        </a>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Нет менеджеров</a>
+                        </a>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

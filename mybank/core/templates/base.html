@@ -1,0 +1,319 @@
+<!-- core/templates/core/base.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ДепБанк{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a2a3a;
+            --secondary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #219a52 100%);
+            color: white;
+        }
+        
+        .balance-card h3 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #219a52 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+            border: none;
+        }
+        
+        .table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+        }
+        
+        footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+        
+        .profit-positive {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .profit-negative {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .market-ticker {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .market-ticker .ticker-item {
+            margin: 0 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        
+        .price-up {
+            color: var(--accent-color);
+        }
+        
+        .price-down {
+            color: var(--danger-color);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'core:home' %}">
+                <i class="fas fa-landmark me-2"></i>ДепБанк
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'client' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:dashboard' %}">
+                                    <i class="fas fa-chart-line me-1"></i>Мой кабинет
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:account' %}">
+                                    <i class="fas fa-wallet me-1"></i>Счёт
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:market' %}">
+                                    <i class="fas fa-chart-simple me-1"></i>Рынок
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:portfolio' %}">
+                                    <i class="fas fa-briefcase me-1"></i>Портфель
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:transactions' %}">
+                                    <i class="fas fa-history me-1"></i>История
+                                </a>
+                            </li>
+                        {% elif user.role == 'manager' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:manager_clients' %}">
+                                    <i class="fas fa-users me-1"></i>Клиенты
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:manager_withdrawals' %}">
+                                    <i class="fas fa-money-bill-wave me-1"></i>Заявки на вывод
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:manager_company_requests' %}">
+                                    <i class="fas fa-building me-1"></i>Заявки предприятий
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:manager_companies' %}">
+                                    <i class="fas fa-industry me-1"></i>Предприятия
+                                </a>
+                            </li>
+                        {% elif user.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_clients' %}">
+                                    <i class="fas fa-users me-1"></i>Клиенты
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_managers' %}">
+                                    <i class="fas fa-user-tie me-1"></i>Менеджеры
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_assets' %}">
+                                    <i class="fas fa-chart-line me-1"></i>Активы
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_margin_call' %}">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Маржин-колл
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_commission' %}">
+                                    <i class="fas fa-percent me-1"></i>Комиссия
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core:admin_logs' %}">
+                                    <i class="fas fa-scroll me-1"></i>Логи
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}"><i class="fas fa-info-circle me-1"></i>О компании</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:faq' %}"><i class="fas fa-question-circle me-1"></i>FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:contacts' %}"><i class="fas fa-envelope me-1"></i>Контакты</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Выйти</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}">О компании</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:faq' %}">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:contacts' %}">Контакты</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="{% url 'login' %}">Вход</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-primary ms-2" href="{% url 'core:register' %}">Регистрация</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Динамический биржевой тикер -->
+    <div class="market-ticker">
+        <div class="container">
+            <div class="d-flex justify-content-between flex-wrap" id="ticker-container">
+                {% if indices %}
+                    {% for index in indices %}
+                        <span class="ticker-item">
+                            <strong>{{ index.name }}</strong>
+                            {{ index.current_price|floatformat:0 }}
+                            <span class="{% if index.change_percent >= 0 %}price-up{% else %}price-down{% endif %}">
+                                {{ index.change_symbol|default:"▲" }} {{ index.change_percent|floatformat:2 }}%
+                            </span>
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <!-- Запасной вариант: показываем заглушку -->
+                    <span><i class="fas fa-chart-line me-1"></i>Загрузка индексов...</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main class="container py-4 flex-grow-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-landmark me-2"></i>ДепБанк</h5>
+                    <p>Ваш надёжный финансовый партнёр</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Контакты</h5>
+                    <p><i class="fas fa-phone me-2"></i>+375 (29) 101-14-88</p>
+                    <p><i class="fas fa-envelope me-2"></i>dodep@depbank.com</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Режим работы</h5>
+                    <p>Пн-Пт: 9:00 - 20:00<br>Сб: 10:00 - 16:00</p>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <p class="mb-0">&copy; 2025 Dodep. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

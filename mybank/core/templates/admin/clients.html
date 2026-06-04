@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление клиентами - MyBank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Управление клиентами</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Список клиентов</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Email</th>
+                            <th>Баланс</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>{{ client.id }}</a></td>
+                            <td>{{ client.username }}</a></td>
+                            <td>{{ client.email }}</a></td>
+                            <td>{{ client.profile.balance|floatformat:2 }} ₽</a></td>
+                            <td>
+                                {% if client.is_active %}
+                                    <span class="badge bg-success">Активен</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Заблокирован</span>
+                                {% endif %}
+                            </a>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-warning" onclick="openBalanceModal({{ client.id }}, '{{ client.username }}', {{ client.profile.balance }})">
+                                    <i class="fas fa-edit"></i> Изменить баланс
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="openBlockModal({{ client.id }}, '{{ client.username }}', {{ client.is_active|yesno:"true,false" }})">
+                                    {% if client.is_active %}
+                                        <i class="fas fa-ban"></i> Заблокировать
+                                    {% else %}
+                                        <i class="fas fa-check"></i> Разблокировать
+                                    {% endif %}
+                                </button>
+                            </a>
+                        </a>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно изменения баланса (одно на всех) -->
+<div class="modal fade" id="balanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="" id="balanceForm">
+                {% csrf_token %}
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="balanceModalTitle">Изменение баланса</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="currentBalanceText">Текущий баланс: </p>
+                    <div class="mb-3">
+                        <label class="form-label">Сумма</label>
+                        <input type="number" name="amount" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Операция</label>
+                        <select name="operation" class="form-select" required>
+                            <option value="add">➕ Пополнить</option>
+                            <option value="subtract">➖ Списать</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Причина</label>
+                        <textarea name="reason" class="form-control" rows="2" placeholder="Укажите причину изменения баланса"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-warning">Применить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно блокировки/разблокировки (одно на всех) -->
+<div class="modal fade" id="blockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="" id="blockForm">
+                {% csrf_token %}
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="blockModalTitle">Блокировка клиента</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="blockModalBody">Вы действительно хотите заблокировать клиента?</p>
+                    <div class="mb-3">
+                        <label class="form-label">Причина</label>
+                        <textarea name="reason" class="form-control" rows="2" placeholder="Укажите причину"></textarea>
+                    </div>
+                    <input type="hidden" name="action" id="blockAction" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-danger" id="blockSubmitBtn">Заблокировать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openBalanceModal(clientId, username, currentBalance) {
+        const modal = document.getElementById('balanceModal');
+        const form = document.getElementById('balanceForm');
+        const title = document.getElementById('balanceModalTitle');
+        const balanceText = document.getElementById('currentBalanceText');
+        
+        title.innerText = 'Изменение баланса: ' + username;
+        balanceText.innerHTML = 'Текущий баланс: <strong>' + currentBalance.toFixed(2) + ' ₽</strong>';
+        form.action = '/admin/clients/' + clientId + '/balance/';
+        
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+    
+    function openBlockModal(clientId, username, isActive) {
+        const modal = document.getElementById('blockModal');
+        const form = document.getElementById('blockForm');
+        const title = document.getElementById('blockModalTitle');
+        const body = document.getElementById('blockModalBody');
+        const actionInput = document.getElementById('blockAction');
+        const submitBtn = document.getElementById('blockSubmitBtn');
+        
+        if (isActive) {
+            title.innerText = 'Блокировка клиента: ' + username;
+            body.innerHTML = 'Вы действительно хотите <strong>заблокировать</strong> клиента ' + username + '?';
+            actionInput.value = 'block';
+            submitBtn.innerText = 'Заблокировать';
+            submitBtn.classList.add('btn-danger');
+            submitBtn.classList.remove('btn-success');
+        } else {
+            title.innerText = 'Разблокировка клиента: ' + username;
+            body.innerHTML = 'Вы действительно хотите <strong>разблокировать</strong> клиента ' + username + '?';
+            actionInput.value = 'unblock';
+            submitBtn.innerText = 'Разблокировать';
+            submitBtn.classList.add('btn-success');
+            submitBtn.classList.remove('btn-danger');
+        }
+        
+        form.action = '/admin/clients/' + clientId + '/block/';
+        
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+</script>
+{% endblock %}

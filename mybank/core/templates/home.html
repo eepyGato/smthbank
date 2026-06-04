@@ -1,0 +1,82 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}MyBank - Личный банковский кабинет{% endblock %}
+
+{% block content %}
+<div class="row align-items-center min-vh-75">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <h1 class="display-4 fw-bold mb-4">Управляйте финансами <span class="text-success">с умом</span></h1>
+        <p class="lead mb-4">Откройте счёт в MyBank — современном банке с возможностью инвестировать в акции, управлять портфелем и получать доход.</p>
+        <div class="d-flex gap-3">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'core:register' %}" class="btn btn-primary btn-lg">Открыть счёт</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg">Войти</a>
+            {% else %}
+                <a href="{% url 'core:dashboard' %}" class="btn btn-primary btn-lg">Перейти в кабинет</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="row g-3">
+            <div class="col-6">
+                <div class="card text-center p-3">
+                    <i class="fas fa-chart-line fa-3x text-success mb-2"></i>
+                    <h3>Инвестиции</h3>
+                    <p>Покупайте акции лучших компаний</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card text-center p-3">
+                    <i class="fas fa-wallet fa-3x text-primary mb-2"></i>
+                    <h3>Удобство</h3>
+                    <p>Управляйте счётом онлайн 24/7</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card text-center p-3">
+                    <i class="fas fa-shield-alt fa-3x text-info mb-2"></i>
+                    <h3>Безопасность</h3>
+                    <p>Ваши средства под надёжной защитой</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card text-center p-3">
+                    <i class="fas fa-headset fa-3x text-warning mb-2"></i>
+                    <h3>Поддержка</h3>
+                    <p>Профессиональная помощь 24/7</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Преимущества -->
+<div class="row mt-5 pt-5">
+    <div class="col-12 text-center mb-4">
+        <h2>Почему выбирают MyBank?</h2>
+        <p class="text-muted">Тысячи клиентов уже доверяют нам</p>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="fas fa-percent fa-3x text-success mb-3"></i>
+            <h4>Низкая комиссия</h4>
+            <p>Всего {{ commission.commission_percent }}% за сделку — одна из самых низких на рынке</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="fas fa-rocket fa-3x text-primary mb-3"></i>
+            <h4>Мгновенные операции</h4>
+            <p>Покупка и продажа акций происходит моментально</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 p-4 text-center">
+            <i class="fas fa-chart-pie fa-3x text-info mb-3"></i>
+            <h4>Аналитика</h4>
+            <p>Подробная статистика и графики вашего портфеля</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+<!-- templates/market.html -->
+{% extends 'base.html' %}
+
+{% block title %}Рынок - MyBank{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-chart-simple me-2"></i>Рынок акций</h1>
+    <span class="badge bg-secondary fs-6">Комиссия: {{ commission.commission_percent }}%</span>
+</div>
+
+<div class="row">
+    {% for asset in assets %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="mb-0">{{ asset.symbol }}</h4>
+                        <small class="text-muted">{{ asset.name }}</small>
+                    </div>
+                    <i class="fas fa-chart-line fa-2x text-primary"></i>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="display-6 fw-bold text-primary">{{ asset.current_price|floatformat:2 }} ₽</div>
+                    <small class="text-muted">Обновлено: {{ asset.last_update|date:"d.m.Y H:i" }}</small>
+                </div>
+                
+                <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#buyModal{{ asset.id }}">
+                    <i class="fas fa-cart-plus me-2"></i>Купить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно покупки -->
+    <div class="modal fade" id="buyModal{{ asset.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'core:buy_asset' asset.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Покупка {{ asset.symbol }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Текущая цена:</strong> {{ asset.current_price|floatformat:2 }} ₽</p>
+                        <p><strong>Комиссия:</strong> {{ commission.commission_percent }}%</p>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Количество акций</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" step="0.000001" min="0.000001" required>
+                            <div class="form-text">Минимальное количество: 0.000001</div>
+                        </div>
+                        <div class="alert alert-info">
+                            <small>Итоговая стоимость будет рассчитана с учётом комиссии</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Подтвердить покупку</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>Активы временно недоступны. Ожидайте пополнения каталога.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
