@@ -7,6 +7,8 @@ import dj_database_url
 # Load environment variables
 load_dotenv()
 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
