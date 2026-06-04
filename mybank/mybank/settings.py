@@ -189,11 +189,11 @@ os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, 'media'), exist_ok=True)
 
 # mybank/settings.py
-from celery.schedules import crontab
+#from celery.schedules import crontab
 
-CELERY_BEAT_SCHEDULE = {
-    'update-stock-prices-every-5-minutes': {
-        'task': 'core.tasks.update_all_stock_prices',
-        'schedule': 3,  # 300 секунд = 5 минут
-    },
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'update-stock-prices-every-5-minutes': {
+#         'task': 'core.tasks.update_all_stock_prices',
+#         'schedule': 3,  # 300 секунд = 5 минут
+#     },
+# }
