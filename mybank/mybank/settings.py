@@ -124,10 +124,10 @@ LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Celery Configuration
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
+#CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+#CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379')
+#CELERY_ACCEPT_CONTENT = ['json']
+#CELERY_TASK_SERIALIZER = 'json'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
