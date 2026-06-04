@@ -8,3 +8,4 @@ python-dotenv==1.0.0
 django-crispy-forms==2.1
 crispy-bootstrap5==0.7
 django_cryptography
+Pillow==12.2.0
