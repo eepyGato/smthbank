@@ -7,7 +7,7 @@ import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
-import django_cryptography.fields
+#import django_cryptography.fields
 
 
 class Migration(migrations.Migration):
@@ -180,7 +180,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('full_name', models.CharField(max_length=200, verbose_name='ФИО')),
-                ('phone', django_cryptography.fields.encrypt(models.CharField(max_length=20, verbose_name='Телефон'))),
+                ('phone', models.CharField(max_length=20, verbose_name='Телефон')),
                 ('email', models.EmailField(max_length=254, verbose_name='Email')),
                 ('salary', models.DecimalField(decimal_places=2, default=0, max_digits=10, verbose_name='Зарплата')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')),

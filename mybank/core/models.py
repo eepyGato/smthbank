@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.utils import timezone
-from django_cryptography.fields import encrypt
+#from django_cryptography.fields import encrypt
 from datetime import date
 import logging
 
@@ -276,7 +276,7 @@ class Employee(models.Model):
         verbose_name="Предприятие"
     )
     full_name = models.CharField("ФИО", max_length=200)
-    phone = encrypt(models.CharField("Телефон", max_length=20))
+    phone = models.CharField("Телефон", max_length=20)
     email = models.EmailField("Email")
     salary = models.DecimalField("Зарплата", max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
